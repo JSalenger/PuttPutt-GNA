@@ -1,0 +1,42 @@
+def DrawBG():
+    background(135, 206, 235)
+    noStroke()
+
+    fill(30, 163, 3)
+
+    rect(0, height - 100, width, 100)
+    fill(110, 79, 0)
+    rect(100, height - 23 - (50), 10, 50)
+    rect(210, height - 70 - (50), 10, 50)
+    rect(270, height - 40 - (50), 10, 50)
+    rect(290, height - 80 - (50), 10, 50)
+    rect(360, height - 30 - (50), 10, 50)
+    rect(390, height - 60 - (50), 10, 50)
+    rect(450, height - 10 - (50), 10, 50)
+    rect(500, height - 70 - (50), 10, 50)
+    rect(530, height - 30 - (50), 10, 50)
+    rect(600, height - 34 - (50), 10, 50)
+    rect(710, height - 67 - (50), 10, 50)
+    
+    fill(1, 74, 18)
+    circle(105, height - 23 - (50), 40)
+    circle(295, height - 80 - (50), 40)
+    circle(215, height - 70 - (50), 40)
+    circle(275, height-40-(50), 40)
+    circle(275, height-40-(50), 40)
+    circle(365, height-30-(50), 40)
+    circle(395, height-60-(50), 40)
+    circle(455, height-10-(50), 40)
+    circle(505, height-70-(50), 40)
+    circle(535, height-30-(50), 40)
+    circle(605, height-34-(50), 40)
+    circle(715, height-67-(50), 40)
+    
+    fill(255)
+    ellipse(105, height-500, 100, 20)
+    ellipse(120, height-700, 200, 10)
+    ellipse(300, height-550, 400, 30)
+    ellipse(700, height-400, 20, 5)
+    ellipse(525, height-655, 100, 20)
+
+    
