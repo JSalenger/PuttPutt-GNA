@@ -9,7 +9,7 @@ from constants import ballRadius, holePosition, HILL_RADIUS, HILL_CENTER, VALLEY
 
 
 class Populate:
-    def __init__(self, velocity, position=V(1.5, .2, 0), dt=.1, mass=.045, color="white", **kwargs):
+    def __init__(self, velocity, position=V(2, .2, 0), dt=.1, mass=.045, color="white", **kwargs):
         self.position = position
         self.startingDt = dt
         self.dt = dt
@@ -35,40 +35,17 @@ class Populate:
 
         # return Populate(random() * 90, gravity, drag, magnus, dt=dt)
         # return Populate(V(2, 0, 0), dt=dt, mass=mass)
-        return Populate(V((random()-.5) * 4, (random()-.5)*8, 0), dt=dt, mass=mass)
+        return Populate(V((random()-.5) * 6, (random()-.5)*12, 0), dt=dt, mass=mass)
         # return Populate(V(gauss(0, .5), gauss(0, 1.5), 0), dt=dt, mass=mass)
         
     @staticmethod
-    def createFrom(populate, stdDev, color="white", dt=None):
+    def createFrom(populate, stdDev, color="white"):
         velocity = V(gauss(populate.startingVelocity.x, stdDev), gauss(populate.startingVelocity.y, stdDev), 0)
 
-        if dt == None:
-            dt = populate.startingDt
-
-        return Populate(velocity, dt=dt, mass=populate.mass, color=color)
+        return Populate(velocity, dt=populate.startingDt, mass=populate.mass, color=color)
 
     def stepBack(self):
         self.position -= self.velocity * self.dt
-
-    def getHillOrValleyForce(self):
-        if (self.position - HILL_CENTER).m < HILL_RADIUS:
-            if (self.position - HILL_CENTER).m < HILL_RADIUS / 2:
-                r = self.position - HILL_CENTER # pointing towards ball
-                return r(.2 * r.m)
-            else:
-                r = self.position - HILL_CENTER # pointing towards ball
-                return r(.05 / r.m)
-
-                
-        elif (self.position - VALLEY_CENTER).m < VALLEY_RADIUS:
-            if (self.position - VALLEY_CENTER).m < VALLEY_RADIUS / 2:
-                r = VALLEY_CENTER - self.position # pointing towards valley
-                return r(.2 * r.m)
-            else:
-                r = VALLEY_CENTER - self.position # pointing towards valley
-                return r(.05 / r.m)
-
-        return V(0, 0, 0)
 
     def collision(self, walls=None):
         # subtract radius
@@ -96,36 +73,31 @@ class Populate:
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-        if (self.position.y > self.position.x * 2 and (self.position + self.velocity * self.dt).y < self.position.x * 2) and self.position.x > 1 and self.position.x < 2:
-            # collision from top
-            self.stepBack()
-            Nn = V(-1, 1, 0)
-            Nn = Nn() # scale to len 1
+        if ((self.position + self.velocity * self.dt).x > 1.5 and (self.position.x < 1.5)) and self.position.y < 3:
+            # collision from the left
+            Nn = V(-1, 0, 0)
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-        if (self.position.y < self.position.x * 2 and (self.position + self.velocity * self.dt).y > self.position.x * 2) and self.position.x > 1 and self.position.x < 2:
-            # collision from bottom 
-            self.stepBack()
-            Nn = V(1, -1, 0)
-            Nn = Nn() # scale to len 1
+        if ((self.position + self.velocity * self.dt).x < 1.5 and (self.position.x > 1.5)) and self.position.y < 3:
+            # collision from the right
+            Nn = V(1, 0, 0)
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-
 
     def update(self):
         if self.dead:
             return    
         
-        forces = (-.015 * self.velocity) + self.getHillOrValleyForce()
+        forces = (-.015 * self.velocity)
 
         self.collision()
 
         p, v = tick(forces, self.mass, self.velocity, self.position, self.dt)
         self.velocity = v
         self.position = p
-
+                
         self.tT += self.dt
                 
         if self.velocity.m <= 0.005 or self.tT > 120:
@@ -138,18 +110,22 @@ class Populate:
         
     def display(self):
         self.sphere.move(self.velocity.x * self.dt, self.velocity.y * self.dt)
-
-    def setColor(self, color):
-        self.sphere.undraw()
-        # self.sphere.setFill(color)
-        # self.sphere.draw(WindowSingleton()())
         
     def __call__(self):
         died = self.update()
         self.display()
         return died
+    
+    def setColor(self, color):
+        self.sphere.undraw()
+        # self.sphere.setFill(color)
+        # self.sphere.draw(WindowSingleton()())
         
     def getScore(self):
+        if self.position.x > 1.5 and self.position.y < 3:
+            return self.position - holePosition + V(5, 0, 0)
+        if self.position.x > 1.5:
+            return self.position - holePosition + V(1, 0, 0)
         return self.position - holePosition
 
     def __del__(self):

@@ -28,6 +28,7 @@ class Populate:
         self.inHole = False
 
         self.tT = 0
+        self.acceleration = V(0, 0, 0)
     
     @staticmethod
     def createNew(dt=.1):
@@ -35,7 +36,7 @@ class Populate:
 
         # return Populate(random() * 90, gravity, drag, magnus, dt=dt)
         # return Populate(V(2, 0, 0), dt=dt, mass=mass)
-        return Populate(V((random()-.5) * 4, (random()-.5)*8, 0), dt=dt, mass=mass)
+        return Populate(V((random()-.5) * 6, (random()-.5)*14, 0), dt=dt, mass=mass)
         # return Populate(V(gauss(0, .5), gauss(0, 1.5), 0), dt=dt, mass=mass)
         
     @staticmethod
@@ -96,19 +97,33 @@ class Populate:
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-        if (self.position.y > self.position.x * 2 and (self.position + self.velocity * self.dt).y < self.position.x * 2) and self.position.x > 1 and self.position.x < 2:
-            # collision from top
+        if (self.position.x * 2 - self.position.y) < .1 and (self.position.x * 2 - self.position.y) > -.1 and self.position.y < 4 and self.position.y > 2:
+            # collision
             self.stepBack()
-            Nn = V(-1, 1, 0)
+            Nn = V(0, 0, 0)
+            if self.velocity.x > 0:
+                if self.velocity.y > 0:
+                    Nn = V(-1, -1, 0)
+                else:
+                    Nn = V(-1, 1, 0)
+            else:
+                if self.velocity.y > 0:
+                    Nn = V(1, -1, 0)
+                else:
+                    Nn = V(1, 1, 0)
             Nn = Nn() # scale to len 1
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-        if (self.position.y < self.position.x * 2 and (self.position + self.velocity * self.dt).y > self.position.x * 2) and self.position.x > 1 and self.position.x < 2:
-            # collision from bottom 
-            self.stepBack()
-            Nn = V(1, -1, 0)
-            Nn = Nn() # scale to len 1
+        if ((self.position + self.velocity * self.dt).x > 1 and (self.position.x < 1)) and self.position.y < 2:
+            # collision from the left
+            Nn = V(-1, 0, 0)
+            rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
+            speed_kept = 1 - .2 * abs(self.velocity() * rNn)
+            self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
+        if ((self.position + self.velocity * self.dt).x < 1 and (self.position.x > 1)) and self.position.y < 2:
+            # collision from the right
+            Nn = V(1, 0, 0)
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
@@ -122,13 +137,14 @@ class Populate:
 
         self.collision()
 
-        p, v = tick(forces, self.mass, self.velocity, self.position, self.dt)
+        p, v, a = tick(forces, self.mass, self.velocity, self.position, self.dt)
         self.velocity = v
         self.position = p
+        self.acceleration = a
 
         self.tT += self.dt
                 
-        if self.velocity.m <= 0.005 or self.tT > 120:
+        if self.velocity.m <= 0.005 or self.tT > 60:
             self.dead = True
             self.dt = 0
             self.setColor(color_rgb(126, 140, 1))
@@ -141,8 +157,8 @@ class Populate:
 
     def setColor(self, color):
         self.sphere.undraw()
-        # self.sphere.setFill(color)
-        # self.sphere.draw(WindowSingleton()())
+        self.sphere.setFill(color)
+        self.sphere.draw(WindowSingleton()())
         
     def __call__(self):
         died = self.update()
@@ -150,6 +166,8 @@ class Populate:
         return died
         
     def getScore(self):
+        if self.position.x > 1:
+            return self.position - holePosition + V(500, 0, 0)
         return self.position - holePosition
 
     def __del__(self):

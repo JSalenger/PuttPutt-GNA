@@ -3,7 +3,7 @@ from V import V
 from GNA import GNA
 from WindowSingleton import WindowSingleton
 from graphics import update as refresh
-from graphics import Circle, Point, color_rgb
+from graphics import Circle, Point, color_rgb, Rectangle
 from time import time
 from constants import holePosition, HILL_CENTER, HILL_RADIUS, VALLEY_CENTER, VALLEY_RADIUS
 
@@ -28,7 +28,7 @@ def decreasePopulationCallback(self):
         self.familySizes = [50, 45, 30, 30, 25, 20, 20, 15, 15, 10, 10, 10, 5, 5, 5, 5]
         print("Updated family sizes for next generation to be: [50, 45, 30, 30, 25, 20, 20, 15, 15, 10, 10, 10, 5, 5, 5, 5] (sum: " 
             + str(sum(self.familySizes)) + ")")
-        
+
 def update():
     """ Will be called as many times as possible. """
     gna()
@@ -48,7 +48,19 @@ if __name__ == '__main__':
     # bg color 4, 122, 9
     WindowSingleton()().setBackground(color_rgb(4, 122, 9))
 
+    valley = Circle(Point(VALLEY_CENTER.x, VALLEY_CENTER.y), VALLEY_RADIUS)
+    valley.setFill(color_rgb(2, 189, 11))
+    valley.setOutline(color_rgb(4, 122, 9))
+    valley.draw(WindowSingleton()())
 
+    hill = Circle(Point(HILL_CENTER.x, HILL_CENTER.y), HILL_RADIUS)
+    hill.setFill(color_rgb(0, 148, 7))
+    hill.setOutline(color_rgb(4, 122, 9))
+    hill.draw(WindowSingleton()())
+
+    moat = Rectangle(Point(1, 5), Point(2, 5.25))
+    moat.setFill("blue")
+    moat.draw(WindowSingleton()())
 
     # ball = Circle(Point(1.5, .2), .025)
     # ball.setOutline("white")
@@ -65,10 +77,9 @@ if __name__ == '__main__':
     
     epoch = 0  
 
-    gna = GNA(.01, [70, 65, 50, 50, 45, 40, 40, 35, 35, 30, 30, 30, 25, 25, 25, 15, 15, 5, 5, 5], Populate, .03, [decreaseDeviationCallback, decreaseDtCallback, decreasePopulationCallback], False)
+    gna = GNA(.03, [70, 65, 50, 50, 45, 40, 40, 35, 35, 30, 30, 30, 25, 25, 25, 15, 15, 5, 5, 5], Populate, .03, [decreaseDeviationCallback, decreaseDtCallback, decreasePopulationCallback], False)
     print(sum(gna.familySizes))
-
-
+    
     # TODO: only add drawing changes to callstack when update is about to be called
     timeSinceUpdate = time()
     _FPS = 30

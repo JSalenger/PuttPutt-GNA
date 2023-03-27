@@ -96,22 +96,6 @@ class Populate:
             rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
             speed_kept = 1 - .2 * abs(self.velocity() * rNn)
             self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-        if (self.position.y > self.position.x * 2 and (self.position + self.velocity * self.dt).y < self.position.x * 2) and self.position.x > 1 and self.position.x < 2:
-            # collision from top
-            self.stepBack()
-            Nn = V(-1, 1, 0)
-            Nn = Nn() # scale to len 1
-            rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
-            speed_kept = 1 - .2 * abs(self.velocity() * rNn)
-            self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
-        if (self.position.y < self.position.x * 2 and (self.position + self.velocity * self.dt).y > self.position.x * 2) and self.position.x > 1 and self.position.x < 2:
-            # collision from bottom 
-            self.stepBack()
-            Nn = V(1, -1, 0)
-            Nn = Nn() # scale to len 1
-            rNn = Nn.rotate((0.5-random())*WALL_RANDOM_FACTOR*2)
-            speed_kept = 1 - .2 * abs(self.velocity() * rNn)
-            self.velocity += 2 * rNn * abs(self.velocity * rNn) * speed_kept
 
 
     def update(self):
@@ -128,7 +112,7 @@ class Populate:
 
         self.tT += self.dt
                 
-        if self.velocity.m <= 0.005 or self.tT > 120:
+        if self.velocity.m <= 0.005 or self.tT > 120 or (self.position.x > 1 and self.position.x < 2 and self.position.y > 5 and self.position.y < 5.25):
             self.dead = True
             self.dt = 0
             self.setColor(color_rgb(126, 140, 1))
@@ -141,8 +125,8 @@ class Populate:
 
     def setColor(self, color):
         self.sphere.undraw()
-        # self.sphere.setFill(color)
-        # self.sphere.draw(WindowSingleton()())
+        self.sphere.setFill(color)
+        self.sphere.draw(WindowSingleton()())
         
     def __call__(self):
         died = self.update()
@@ -150,6 +134,8 @@ class Populate:
         return died
         
     def getScore(self):
+        if (self.position.x > 1 and self.position.x < 2 and self.position.y > 5 and self.position.y < 5.25):
+            return self.position - holePosition + V(500, 0, 0)
         return self.position - holePosition
 
     def __del__(self):

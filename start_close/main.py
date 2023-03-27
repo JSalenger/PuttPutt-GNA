@@ -3,7 +3,7 @@ from V import V
 from GNA import GNA
 from WindowSingleton import WindowSingleton
 from graphics import update as refresh
-from graphics import Circle, Point, color_rgb
+from graphics import Circle, Point, color_rgb, Line
 from time import time
 from constants import holePosition, HILL_CENTER, HILL_RADIUS, VALLEY_CENTER, VALLEY_RADIUS
 
@@ -59,13 +59,16 @@ if __name__ == '__main__':
     hole.setFill("black")
     hole.draw(WindowSingleton()())
 
+    wall = Line(Point(1.5, 0), Point(1.5, 3))
+    wall.draw(WindowSingleton()())
+
     position = V(0, 0, 0)
     velocity = V(0, 0, 0)
     tT = 0
     
     epoch = 0  
 
-    gna = GNA(.01, [70, 65, 50, 50, 45, 40, 40, 35, 35, 30, 30, 30, 25, 25, 25, 15, 15, 5, 5, 5], Populate, .03, [decreaseDeviationCallback, decreaseDtCallback, decreasePopulationCallback], False)
+    gna = GNA(.03, [70, 65, 50, 50, 45, 40, 40, 35, 35, 30, 30, 30, 25, 25, 25, 15, 15, 5, 5, 5], Populate, .03, [decreaseDeviationCallback, decreaseDtCallback, decreasePopulationCallback], False)
     print(sum(gna.familySizes))
 
 
